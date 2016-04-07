@@ -1,0 +1,74 @@
+<html>
+<header>
+<TITLE>TECNUN MOTORSPORT</TITLE>
+
+<link rel="stylesheet" type="text/css" href="estilo.css">
+
+</header>
+
+<body>
+
+<p id="LoginMsg">
+Please Log In!
+</p>
+
+	<script>
+	
+	username = checkSession();
+	
+	function checkSession(){
+		var userLoggedIn="";
+			var xmlhttp = new XMLHttpRequest();
+			var url = "CheckSession";
+
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					userLoggedIn = xmlhttp.response;
+					if(userLoggedIn==""){
+						 window.location="./loginPage.html";
+					}else{
+					document.getElementById("LoginMsg").innerHTML="Welcome, "+ userLoggedIn;
+					}
+				}
+			};
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();
+			
+			
+
+			return userLoggedIn;
+	}
+	
+	</script>
+
+	
+<form action="editProfile.html">
+    <input class="btn" type="submit" value="Edit Profile">
+</form>
+<input class="btn" type="button" value="Log Out" onclick="logOut()">
+
+<script>
+
+	function logOut(){
+
+		var xmlhttp = new XMLHttpRequest();
+			var url = "Logout";
+			var response = "";
+			
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					response = xmlhttp.response;
+					document.getElementById("LoginMsg").innerHTML="logging out";
+					window.location="./loginPage.html";
+
+					
+				}
+			};
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();	
+
+	}
+</script>
+
+</body>
+</html>

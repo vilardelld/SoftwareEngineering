@@ -1,0 +1,184 @@
+<html>
+<header>
+<TITLE>TECNUN MOTORSPORT</TITLE>
+	
+	<link rel="stylesheet" type="text/css" href="estilo.css">
+
+	<style>
+	body{
+	font-size:1.0em;
+	}
+	
+	.floatdiv {
+		float:left;
+		height: 250px;
+		width: 49%;
+		top: 0px;
+		
+	}
+	</style>
+    
+</header>
+<body>
+    
+    <p id="message" style="color:red"></p>
+
+    <form id="profileForm">
+        <p>Usuario</p>
+        <input type="text" name="userID" id="userID">
+
+        <p>Nombre</p>
+        <input type="text" name="nombre" id="nombre">
+        <p>
+            
+        <p>Apellido</p>
+        <input type="text" name="apellido" id="apellido">
+        <p>
+        
+    </form>
+	
+	<br>
+	    <input class="btn" type="button" value="Guardar" onclick="saveChanges()">
+		<input class="btn" type="button" value="Descartar Cambios" onclick="loadProfile()">
+	<br>
+	
+	<!--Profile Picture -->
+	<div> 
+        <p id="imgText"> </p>
+        <br>
+        <img src="" id="img" height="80">
+    </div>
+
+	
+	<p>Cambiar el foto de perfil: </p> <br/>
+	<form action="UploadServlet" method="post"
+								enctype="multipart/form-data">
+		<input class="btn" type="file" name="file" size="50" />
+		<br />
+		<input class="btn" type="submit" value="Upload Archivo" />
+
+	</form>
+
+	<br><br>
+        
+
+	
+
+	<form action="startPage.html">
+		<input class="btn" type="submit" value="Home">
+	</form>
+
+    <script>
+        loadProfile();
+
+        function loadProfile(){
+            
+            var xmlhttp = new XMLHttpRequest();
+            var url = "LoadProfile";
+
+			var id="";
+			
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    
+                    var response = xmlhttp.responseText;
+                    var jsonObject = JSON.parse(response);
+                    
+                    id = jsonObject.id;
+                    var nombre = jsonObject.nombre;
+                    var apellido = jsonObject.apellido;
+					
+					if(id=="failed"){
+						window.location="./loginPage.html";
+					}else{
+						document.getElementById("userID").value = id;
+						document.getElementById("nombre").value = nombre;
+						document.getElementById("apellido").value = apellido;
+						
+						var name=document.getElementById("userID").value;
+						getUserImg(name);
+					}
+
+                }
+            };
+            
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+
+            xmlhttp.send();
+
+        
+        }
+            
+        function saveChanges(){
+            
+            var xmlhttp = new XMLHttpRequest();
+            var url = "EditProfile";
+
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    
+                    var response = xmlhttp.responseText;
+                    
+                    if(response=="succeeded"){
+                        alert("Cambios guardado");
+                    }else{
+                        document.getElementById("message").value="Oops, something went wrong! Your changes were not saved. Make sure you are logged in!";
+                    }
+                }
+            };
+            
+            xmlhttp.open("POST", url, true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            var userID = document.getElementById("userID").value;
+            var nombre = document.getElementById("nombre").value;
+            var apellido = document.getElementById("apellido").value;
+
+            xmlhttp.send("userID="+userID+"&nombre="+nombre+"&apellido="+apellido);
+        
+        }
+
+    
+	
+		function getUserImg(name){
+            
+			if(name.length>0){
+
+				var xmlhttp = new XMLHttpRequest();
+				var url = "UserImgServlet";
+
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+						var imageReturned = xmlhttp.response;
+						postImage(imageReturned);
+					}
+				};
+				xmlhttp.open("POST", url, true);
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+				xmlhttp.send("username="+name);
+			}else{}
+            
+        }
+    
+    function postImage(imgURL){
+        image = document.getElementById("img");
+
+        if(imgURL=="no image" || imgURL.length<1){
+            document.getElementById("imgText").innerHTML="no image available";
+            image.src="";
+        }else{
+            document.getElementById("imgText").innerHTML="Image of user:";
+            image.src=imgURL;
+        }
+
+    }
+
+    </script>
+	
+	
+    
+</body>
+</html>
